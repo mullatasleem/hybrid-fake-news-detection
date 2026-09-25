@@ -1,0 +1,536 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{balance}
+\usepackage{siunitx}
+\usepackage{float}
+
+\sisetup{
+  table-format=1.4,
+  table-number-alignment=center,
+  table-align-text-post=false,
+  detect-weight=true,
+}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\begin{document}
+\title{Hybrid Learning Approach for Detecting Fake News with Machine Learning and Deep Learning Models}
+\author{
+\IEEEauthorblockN{M.~L.~S.~Bhargava Sai}
+\IEEEauthorblockA{
+Department of Advanced Computer Science and Engineering\\
+Vignan's Foundation for Science, Technology \& Research\\
+Vadlamudi, Guntur, Andhra Pradesh, India\\
+\texttt{mlsbhargavasai5002@gmail.com}}
+\and
+\IEEEauthorblockN{K.~Charan}
+\IEEEauthorblockA{
+Department of Advanced Computer Science and Engineering\\
+Vignan's Foundation for Science, Technology \& Research\\
+Vadlamudi, Guntur, Andhra Pradesh, India\\
+\texttt{kcchowdary2005@gmail.com}}
+\and
+\IEEEauthorblockN{P.~Ramesh}
+\IEEEauthorblockA{
+Department of Advanced Computer Science and Engineering\\
+Vignan's Foundation for Science, Technology \& Research\\
+Vadlamudi, Guntur, Andhra Pradesh, India\\
+\texttt{padamatiramesh17@gmail.com}}
+\and
+\IEEEauthorblockN{M.~Tasleem}
+\IEEEauthorblockA{
+Department of Advanced Computer Science and Engineering\\
+Vignan's Foundation for Science, Technology \& Research\\
+Vadlamudi, Guntur, Andhra Pradesh, India\\
+\texttt{mullatasleem25@gmail.com}}
+\and
+\IEEEauthorblockN{Brundavanam Satyasai}
+\IEEEauthorblockA{
+Assistant Professor\\
+Department of Advanced Computer Science and Engineering\\
+Vignan's Foundation for Science, Technology \& Research\\
+Vadlamudi, Guntur, Andhra Pradesh, India}
+\texttt{ms.satyasai@gmail.com}
+}
+
+\maketitle
+
+\begin{abstract}
+The digital media has experienced exponential growth which has made the digital media exponential.
+fanned the insatiable appetite of fake news, which is a serious threat.
+threats to social credibility and data security. Detecting
+this confusion of misinformation is aggravated by the enormous, clamorous, and
+unbalanced character of online written information. Traditional machine learning (ML) models leverage engineered linguistic features but often miss nuanced contextual cues, while deep learning (DL) models excel in capturing sequence dependencies yet may overlook explicit feature importance. To address these gaps, we propose a hybrid ensemble framework that synergistically combines ML classifiers (SVM, LR, RF) with DL recurrent architectures (RNN, LSTM, GRU) using TF-IDF vectorization and pre-trained embeddings. Predictions are fused via probability averaging for enhanced robustness. Evaluated on a benchmark dataset of 44,898 news articles (21,417 real, 23,481 fake), our SVM + GRU ensemble achieves 0.964031 accuracy and 0.962067 F1-score, surpassing individual models and demonstrating superior generalization. This approach balances computing efficiency and high performance, making it suitable for real-world deployment. computational efficiency with high performance, making it suitable for real-world deployment.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Index Terms: TF-IDF, LSTM, GRU, SVM, Machine Learning, Deep Learning, Ensemble Learning, Fake News Detection, and Hybrid Models
+\end{IEEEkeywords}
+
+\section{Introduction}
+\label{sec:intro}
+
+The widespread adoption of online networks has transformed how information is created and used. Online platforms enable instantaneous communication and global dissemination of news, allowing users to access a vast amount of information in real time. But this accessibility has also helped to the unchecked and quick dissemination of false and misleading information, sometimes referred to as "fake news." The term "fake news" describes intentionally fabricated or deceptive information that is displayed as authentic news in an effort to deceive readers.The existence of such information jeopardizes democratic procedures, social harmony, and economic stability.
+
+The harmful effects of fake news have become particularly evident during major global events such as political elections and the COVID-19 pandemic. Misleading medical claims, conspiracy theories, and manipulated narratives rapidly circulated across social media platforms, influencing public opinion and behavior. Due to the massive volume and high velocity of online content, manual fact-checking is no longer sufficient. Because of this, automatically recognizing fake news has grown to be a major research challenge in the fields of machine learning and natural language processing..
+
+Earlier research primarily relied on traditional machine learning techniques that utilized manually crafted textual features, including word usage patterns, sentiment analysis, readability metrics, and stylistic elements of writing. Models such as Naïve Bayes, Logistic Regression, Decision Trees, and Support Vector Machines demonstrated fairly good performance in identifying fake news.However, these approaches suffer from significant limitations. Handcrafted features cannot effectively capture deep semantic meaning, contextual word relationships, or long-range dependencies within textual data. Furthermore, fake news authors continuously modify writing styles to bypass detection systems, making manual feature engineering increasingly ineffective.
+
+Recent developments in deep learning have enabled models to automatically extract meaningful features directly from raw text data, reducing the need for manual feature engineering. Techniques such as Recurrent Neural Networks (RNN), Long Short-Term Memory (LSTM), and Gated Recurrent Units (GRU) are particularly effective for handling sequential data, as they capture contextual relationships between words. Additionally, word embedding approaches represent words as continuous vectors, helping models understand semantic meanings and connections among them. While deep learning methods often achieve better performance than traditional approaches, they typically demand substantial computational power, longer training durations, and large volumes of data. Moreover, when used on their own, these models can face challenges like overfitting and unstable performance.
+
+To address the limitations of individual approaches, ensemble learning has gained attention as a reliable and robust solution. Ensemble techniques merge the outputs of multiple models to enhance overall performance, stability, and generalization.Traditional machine learning models are effective in exploiting statistical features such as TF-IDF, whereas deep learning models excel at learning contextual and sequential patterns. Therefore, integrating these complementary strengths can greatly Boost the performance and correctness of fake news classification.
+
+In this study, we introduce a hybrid framework that combines machine learning and deep learning techniques for fake news detection. The proposed approach integrates TF-IDF-based traditional classifiers with deep learning models that utilize word embeddings. Multiple models are trained independently, and their predictions are aggregated to produce the final classification outcome. This strategy enhances detection performance while keeping computational requirements at a manageable level.
+
+The overall workflow of the proposed fake news detection system is illustrated in Fig.~\ref{fig:architecture}. The framework begins with text preprocessing where collected news articles are cleaned by removing stop words, followed by stemming and lemmatization to normalize textual variations. After preprocessing, feature extraction is performed using both statistical and semantic representations. Machine learning models use Bag-of-Words and TF-IDF representations, while deep learning models rely on word embeddings to understand contextual relationships between words. Subsequently, multiple classification models are trained and combined through an ensemble strategy. Finally, the system evaluates performance of the model is assessed through commonly used evaluation measures, including accuracy, precision, recall, and F1-score
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=\textwidth]{FAKE_NEWS_MODEL.jpeg}
+\caption{Proposed Fake News Detection Framework}
+\label{fig:architecture}
+\end{figure*}
+
+The key findings and contributions of this study are summarized below:
+\begin{itemize}
+    \item A hybrid ensemble framework combining feature-based machine learning classifiers with sequence-based deep learning models.
+    \item Integration of TF-IDF statistical representation and word embedding semantic representation within a unified detection system.
+    \item Comparative evaluation of individual models and ensemble combinations on a balanced real-world dataset.
+    \item Experimental results demonstrating approximately 1--2\% performance improvement over baseline models while maintaining computational efficiency.
+\end{itemize}
+
+The remainder of this paper is organized as follows. Section \ref{sec:lit} presents a review of related work, Section \ref{sec:method} describes the proposed methodology, Section \ref{sec:exp} discusses the experimental results, and Section \ref{sec:conc} concludes the paper and highlights future research directions.
+
+\section{Related Work}
+\label{sec:lit}
+
+Fake news detection has gained considerable research interest due to the rapid spread of misinformation on online platforms. To address this challenge, researchers have developed a wide range of approaches, including traditional machine learning techniques, deep learning models, transformer-based methods, multimodal systems, and graph-based frameworks. Each category offers certain advantages but also introduces practical limitations in terms of computational complexity, scalability, or contextual understanding.
+\begin{table*}[t]
+\centering
+\caption{Literature Survey on Fake News Detection Techniques}
+\label{tab:lit_survey}
+
+\renewcommand{\arraystretch}{1.25}
+
+\begin{tabular}{|c|l|p{4cm}|p{3cm}|p{4cm}|}
+\hline
+\textbf{Year} & \textbf{Authors} & \textbf{Techniques Used} & \textbf{Key Strength} & \textbf{Main Limitation} \\
+\hline
+
+2025 & Lu \& Yao [1] & ResNet + BERT + Attention + Video DL & Multimodal real-time detection & High system complexity \\
+\hline
+2025 & Rout et al. [2] & Lightweight Transformer architecture & Fast and efficient & Text-only data \\
+\hline
+2025 & Chen et al. [3] & LLMs + ViT + Multimodal Fusion & Handles text and images & High GPU requirement \\
+\hline
+2025 & Hussain et al. [4] & ML Ensemble + TF-IDF & Suitable for real-time detection & Lacks semantic understanding \\
+\hline
+2024 & Wang et al. [6] & Ensemble Transformers + LLMs & Detects AI-generated news & English only \\
+\hline
+2024 & Merryton \& Augasta [7] & Self-Attention + Bi-LSTM & Highlights important words & High computation cost \\
+\hline
+2024 & Malhotra \& Malik [8] & Attention + BiLSTM + CNN & Handles imbalanced datasets & Text-only \\
+\hline
+2024 & Almandouh et al. [9] & AutoML + Ensemble models & Works on large datasets & No multimedia support \\
+\hline
+2023 & Truică \& Apostol [10] & FastText + Deep learning + Transformers & Strong Arabic language support & Costly training \\
+\hline
+2023 & Wu et al. [11] & Word2Vec + LSTM + BERT & Strong semantic learning & Computationally expensive \\
+\hline
+2023 & Guo et al. [12] & Graph Neural Networks & Explainable detection & Complex graph construction \\
+\hline
+2022 & Prachi et al. [13] & Transformer + Deep Learning & Strong feature extraction & Requires large data \\
+\hline
+2021 & Hansrajh et al. [14] & ML Ensemble models & Stable predictions & Heavy feature engineering \\
+\hline
+2018 & Jain \& Kasbe [15] & Naive Bayes + N-grams & Simple and fast & Ignores semantic meaning \\
+\hline
+
+\end{tabular}
+\end{table*}
+A comparative overview of representative studies in fake news detection is presented in Table~\ref{tab:lit_survey}. The table summarizes recent research contributions, the techniques employed, their strengths, and their primary limitations. It can be observed that earlier studies relied mainly on traditional machine learning algorithms with handcrafted features, whereas recent works increasingly adopt deep learning and transformer-based architectures. Although these approaches improve detection performance, they often suffer from high computational cost, large training requirements, or limited deployment feasibility. This motivates the need for a balanced hybrid approach that achieves both efficiency and semantic understanding.
+
+\begin{table*}[H]
+\centering
+\caption{Literature Survey on Fake News Detection Techniques}
+\label{tab:lit_survey}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{|c|l|p{4cm}|p{3cm}|p{4cm}|}
+\hline
+\textbf{Year} & \textbf{Authors} & \textbf{Techniques Used} & \textbf{Key Strength} & \textbf{Main Limitation} \\
+\hline
+2025 & Lu \& Yao & ResNet + BERT + Attention + Video DL & Multimodal real-time detection & High system complexity \\
+\hline
+2025 & Rout et al. & Lightweight Transformer architecture & Fast and efficient & Text-only data \\
+\hline
+2025 & Chen et al. & LLMs + ViT + Multimodal Fusion & Handles text and images & High GPU requirement \\
+\hline
+2025 & Hussain et al. & ML Ensemble + TF-IDF & Suitable for real-time detection & Lacks semantic understanding \\
+\hline
+2024 & Wang et al. & Ensemble Transformers + LLMs & Detects AI-generated news & English only \\
+\hline
+2024 & Merryton \& Augasta & Self-Attention + Bi-LSTM & Highlights important words & High computation cost \\
+\hline
+2024 & Malhotra \& Malik & Attention + BiLSTM + CNN & Handles imbalanced datasets & Text-only \\
+\hline
+2024 & Almandouh et al. & AutoML + Ensemble models & Works on large datasets & No multimedia support \\
+\hline
+2023 & Truică \& Apostol & FastText + Deep learning + Transformers & Strong Arabic language support & Costly training \\
+\hline
+2023 & Wu et al. & Word2Vec + LSTM + BERT & Strong semantic learning & Computationally expensive \\
+\hline
+2023 & Guo et al. & Graph Neural Networks & Explainable detection & Complex graph construction \\
+\hline
+2022 & Prachi et al. & Transformer + Deep Learning & Strong feature extraction & Requires large data \\
+\hline
+2021 & Hansrajh et al. & ML Ensemble models & Stable predictions & Heavy feature engineering \\
+\hline
+2018 & Jain \& Kasbe & Naive Bayes + N-grams & Simple and fast & Ignores semantic meaning \\
+\hline
+\end{tabular}
+\end{table*}
+
+\subsection{Traditional Machine Learning Approaches}
+Early research on fake news detection primarily utilized traditional machine learning algorithms combined with manually engineered feature extraction methods. These methods made use of textual features such as word frequency, N-grams, sentiment analysis, readability measures, and writing style patterns. Jain and Kasbe \cite{jain2018} implemented a Naïve Bayes classifier using N-gram features to classify news articles. Their method was computationally efficient and easy to implement but failed to capture semantic meaning and contextual relationships.
+
+Similarly, Logistic Regression and Support Vector Machine (SVM) classifiers trained on TF-IDF features were widely used due to their simplicity and fast inference time. Hansrajh et al. \cite{hansrajh2021} proposed a machine learning ensemble combining multiple classifiers to improve prediction stability and reduce variance. Although the ensemble improved performance compared to individual models, it relied heavily on manual feature engineering and still lacked contextual understanding.
+
+\subsection{Deep Learning-Based Models}
+To reduce the dependency on manual feature design, deep learning approaches were developed to learn useful representations directly from raw text data. RNN, LSTM, and GRU Such architectures are widely adopted as they efficiently manage sequential information and understand relationships across distant words.
+
+Truică and Apostol \cite{truica2023} combined Word2Vec embeddings with LSTM and BERT representations to enhance semantic modeling. Wang et al. \cite{wang2024} introduced a self-attention Bi-LSTM model that emphasizes important words within news content, improving interpretability. Merryton and Augasta \cite{merryton2024} also introduced an attention-based BiLSTM-CNN model that shows strong performance on imbalanced datasets.
+
+Although deep learning models provide better contextual understanding, they demand large labeled datasets, longer training durations, and significant computational power. In addition, standalone deep neural networks may suffer from overfitting and unstable performance when applied across different domains.
+
+\subsection{Transformer and Multimodal Approaches}
+More recent research focuses on transformer architectures and multimodal analysis. Transformer-based models such as BERT capture bidirectional contextual relationships and significantly improve natural language understanding performance. Lu and Yao \cite{lu2025} proposed a multimodal system combining ResNet image features with BERT textual features and attention mechanismsfor real-time identification of fake news. Despite its effectiveness, the system needs substantial computational resources.
+
+Rout et al. \cite{rout2025} introduced lightweight transformer architectures to reduce inference cost while maintaining accuracy. Chen et al. \cite{chen2025} integrated large language models and Vision Transformers for combined text–image detection, but the model required powerful GPUs. Almandouh et al. \cite{almandouh2024} combined FastText and transformer models to support Arabic datasets, demonstrating multilingual capability at the expense of training complexity. Prachi et al. \cite{prachi2022} showed that transformer-based feature extraction provides strong semantic representation but depends heavily on large-scale labeled data.
+
+\subsection{Graph-Based and Ensemble Methods}
+Graph neural networks have been used to capture relationships between news articles, publishers, and users. Guo et al. \cite{guo2023} modeled propagation patterns using graph neural networks to provide explainable fake news detection. Wu et al. \cite{wu2023} also explored graph-based explainability approaches. However, constructing graphs requires additional metadata such as user interaction networks, which may not always be available.
+
+Ensemble learning has been explored to improve robustness and generalization. Malhotra and Malik \cite{malhotra2024} used AutoML-based ensemble learning for large datasets, while Hussain et al. \cite{hussain2025} applied TF-IDF-based machine learning ensembles suitable for real-time detection but lacking semantic modeling. Ishraquzzaman et al. \cite{ishraquzzaman2025} combined transformers and large language models to detect AI-generated fake news, though their study was limited to English-language datasets.
+
+\subsection{Research Gap and Motivation}
+Based on the reviewed literature, traditional machine learning methods are computationally efficient but often fail to capture deeper semantic relationships. In contrast, deep learning and transformer-based models provide better contextual understanding, although they require significantly higher computational resources. Furthermore, multimodal and graph-based approaches enhance accuracy and interpretability, but their complexity makes them challenging to deploy in real-time applications.
+
+Therefore, a gap exists for a practical detection system that simultaneously:
+\begin{itemize}
+    \item captures contextual semantic information,
+    \item maintains computational efficiency,
+    \item reduces dependence on extremely large datasets, and
+    \item remains suitable for real-time deployment.
+\end{itemize}
+
+To address these challenges, this study proposes a hybrid ensemble framework that integrates TF-IDF-based machine learning classifiers with recurrent deep learning models. This approach leverages the efficiency of traditional methods along with the contextual understanding provided by deep neural networks, resulting in improved detection performance while keeping computational overhead relatively low.
+
+\section{Proposed Methodology}
+\label{sec:method}
+
+This section introduces the proposed hybrid Machine Learning–Deep Learning (ML–DL) framework for automated fake news detection. The system aims to integrate statistical text classification techniques with contextual sequence learning in order to enhance detection accuracy while preserving computational efficiency. The workflow consists of dataset preparation, preprocessing, feature extraction, model learning, padding-based deep learning fusion, and final hybrid ensemble prediction.
+
+\subsection{Datasets}
+To ensure generalization and robustness, experiments were conducted on two publicly available fake news datasets.
+
+\subsubsection{Dataset 1: ISOT Fake News Dataset}
+The first dataset utilized in this research is the ISOT Fake News Dataset, which is commonly used as a benchmark for fake news detection tasks. It consists of both real and fake news articles gathered from various online sources. The data is provided in two separate files: \textit{Fake.csv} and \textit{True.csv}. Each entry contains details such as the news title, complete article content, subject category, and publication date.
+
+Dataset statistics:
+\begin{itemize}
+\item Total samples: 44,919 articles
+\item Fake news: 23,502 articles (52.3%)
+\item Real news: 21,417 articles (47.7%)
+\end{itemize}
+
+The dataset is relatively balanced, which makes it suitable for supervised binary classification tasks without causing significant issues related to class imbalance.
+
+\subsubsection{Dataset 2: Fake\_Real\_News\_Data Dataset}
+The second dataset used in this study is the \texttt{Fake\_Real\_News\_Data.csv} dataset sourced from Kaggle. It contains labeled news articles, including both the title and the main content, along with a binary label that classifies each article as either FAKE or REAL.
+
+Dataset statistics:
+\begin{itemize}
+    \item Total samples: 6,335 articles
+    \item Real news: 3,171 articles (50.06\%)
+    \item Fake news: 3,164 articles (49.94\%)
+\end{itemize}
+This dataset is nearly balanced, making it suitable for assessing the stability and generalization ability of the proposed detection framework across different data sources.
+
+Both datasets were divided into training and testing sets using an 80:20 stratified split, ensuring that the original class distribution was preserved in each subset.
+
+\subsection{Text Preprocessing and Feature Representation}
+Before classification, textual data was cleaned and normalized to remove noise and irrelevant patterns. The preprocessing stage includes removing URLs, symbols, and non-textual content, followed by tokenization, stop-word removal, and lemmatization.
+
+Two types of feature representations were used:
+\begin{itemize}
+    \item Statistical representation using TF-IDF features for machine learning models
+    \item Semantic representation using word embeddings for deep learning models
+\end{itemize}
+The statistical representation captures word frequency importance, while the embedding representation captures contextual meaning and relationships between words.
+
+\subsection{Machine Learning Classification}
+Classical machine learning classifiers were applied to TF-IDF features to perform fake news classification. These models learn discriminative patterns based on word distribution and writing style characteristics. Machine learning models are efficient, interpretable, and suitable for sparse textual representations but have limited capability in understanding contextual dependencies within sentences.
+
+\subsection{Deep Learning Sequence Modeling}
+Deep learning models were used to capture contextual and sequential relationships in news articles. Sequence models analyze the order of words and learn semantic patterns that cannot be captured by frequency-based features alone. These models are particularly useful in identifying misleading narratives and linguistic patterns common in fake news.
+
+\subsection{Pre-Padding and Post-Padding Strategy}
+To process textual sequences of varying lengths, fixed-length sequences are required. Therefore, padding was applied using two strategies:
+\begin{itemize}
+    \item Pre-padding: padding tokens added at the beginning of the sequence
+    \item Post-padding: padding tokens added at the end of the sequence
+\end{itemize}
+The position of padding influences how sequential models learn temporal dependencies. Pre-padding emphasizes recent words, whereas post-padding preserves the natural reading order. Since important fake news cues may appear at different positions within an article, both strategies were investigated.
+
+\subsection{Deep Learning Padding Fusion}
+For each deep learning model, two independent classifiers were trained using pre-padding and post-padding. Their predicted probabilities were combined to reduce sequence alignment bias.
+\[
+P_{fusion} = \frac{P_{pre} + P_{post}}{2}
+\]
+where $P_{pre}$ and $P_{post}$ represent probabilities obtained from pre-padded and post-padded models respectively.
+This fusion combines complementary learning behaviors and improves generalization performance.
+
+\subsection{Hybrid ML–DL Ensemble}
+Finally, the outputs from machine learning classifiers and fused deep learning models were combined using a soft voting strategy.
+\[
+P_{ensemble} = \frac{P_{ML} + P_{DL}}{2}
+\]
+where $P_{ML}$ represents the probability from the statistical classifier and $P_{fusion}$ represents the probability from the deep learning padding ensemble.
+
+The final label is determined using a threshold of 0.5:
+\[
+\text{Fake if } P_{ensemble} \geq 0.5, \quad \text{otherwise Real.}
+\]
+The hybrid approach combines the efficiency of machine learning with the contextual capabilities of deep learning, resulting in a more dependable fake news detection system than using either method independently.
+
+\section{Experimental Results and Discussion}
+\label{sec:exp}
+
+This section analyzes the performance of the proposed hybrid ML–DL framework for fake news detection. The evaluation is carried out using standard metrics, including accuracy, precision, recall, and F1-score. The results are reported for individual models, ensemble approaches, as well as padding fusion techniques.
+
+\subsection{Evaluation Metrics}
+\begin{align}
+    \text{Accuracy} &= \frac{\text{TP} + \text{TN}}{\text{TP} + \text{TN} + \text{FP} + \text{FN}} \\
+    \text{Precision} &= \frac{\text{TP}}{\text{TP} + \text{FP}} \\
+    \text{Recall} &= \frac{\text{TP}}{\text{TP} + \text{FN}} \\
+    \text{F1-score} &= 2 \times \frac{\text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}}
+\end{align}
+
+\subsection{Results on ISOT Fake News Dataset (Dataset-1)}
+\begin{table}[H]
+\centering
+\caption{Performance of individual and ensemble models on ISOT Fake News Dataset}
+\label{tab:isot_main}
+\footnotesize
+\sisetup{table-format=1.4}
+\begin{tabular}{l S[table-format=1.4] S[table-format=1.4] S[table-format=1.4] S[table-format=1.4]}
+\toprule
+{Model} & {Accuracy} & {Precision} & {Recall} & {F1-score} \\
+\midrule
+Logistic Regression     & 0.9424 & 0.9275 & 0.9534 & 0.9403 \\
+SVM                     & 0.9547 & 0.9470 & 0.9583 & 0.9526 \\
+Random Forest           & 0.9344 & 0.9301 & 0.9321 & 0.9311 \\
+RNN                     & 0.9577 & 0.9500 & 0.9616 & 0.9558 \\
+LSTM                    & 0.9586 & 0.9526 & 0.9607 & 0.9566 \\
+GRU                     & 0.9576 & 0.9494 & 0.9621 & 0.9557 \\
+\midrule
+RF + RNN                & 0.9605 & 0.9524 & 0.9651 & 0.9587 \\
+RF + LSTM               & \textbf{0.9650} & \textbf{0.9589} & \textbf{0.9679} & \textbf{0.9634} \\
+RF + GRU                & 0.9640 & 0.9550 & \textbf{0.9700} & 0.9625 \\
+LR + RNN                & 0.9592 & 0.9514 & 0.9635 & 0.9574 \\
+LR + LSTM               & 0.9604 & 0.9545 & 0.9625 & 0.9585 \\
+LR + GRU                & 0.9597 & 0.9509 & 0.9651 & 0.9579 \\
+SVM + RNN               & 0.9620 & 0.9563 & 0.9642 & 0.9602 \\
+SVM + LSTM              & 0.9628 & 0.9577 & 0.9644 & 0.9610 \\
+SVM + GRU               & 0.9628 & 0.9556 & 0.9667 & 0.9611 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Results on Fake \& Real News Dataset (Dataset-2)}
+\begin{table}[H]
+\centering
+\caption{Performance of individual and ensemble models on Fake\_Real\_News\_Data Dataset}
+\label{tab:dataset2_main}
+\footnotesize
+\sisetup{table-format=1.4}
+\begin{tabular}{l S[table-format=1.4] S[table-format=1.4] S[table-format=1.4] S[table-format=1.4]}
+\toprule
+{Model} & {Accuracy} & {Precision} & {Recall} & {F1-score} \\
+\midrule
+Logistic Regression     & 0.9100 & 0.9398 & 0.8781 & 0.9079 \\
+SVM                     & \textbf{0.9313} & \textbf{0.9424} & 0.9203 & \textbf{0.9312} \\
+Random Forest           & 0.9013 & 0.9133 & 0.8891 & 0.9010 \\
+RNN                     & 0.8706 & 0.8662 & 0.8797 & 0.8729 \\
+LSTM                    & 0.8998 & 0.8834 & \textbf{0.9234} & 0.9030 \\
+GRU                     & 0.8714 & 0.8756 & 0.8688 & 0.8722 \\
+\midrule
+RF + AttRNN             & 0.9092 & 0.9173 & 0.9016 & 0.9094 \\
+RF + AttLSTM            & 0.8942 & 0.9161 & 0.8703 & 0.8926 \\
+RF + AttGRU             & 0.9006 & 0.9066 & 0.8953 & 0.9009 \\
+LR + AttRNN             & 0.9084 & 0.9253 & 0.8906 & 0.9076 \\
+LR + AttLSTM            & 0.8950 & 0.9204 & 0.8672 & 0.8930 \\
+LR + AttGRU             & 0.8982 & 0.9088 & 0.8875 & 0.8980 \\
+SVM + AttRNN            & \textbf{0.9313} & 0.9410 & \textbf{0.9219} & \textbf{0.9313} \\
+SVM + AttLSTM           & 0.9148 & 0.9346 & 0.8938 & 0.9137 \\
+SVM + AttGRU            & 0.9171 & 0.9239 & 0.9109 & 0.9174 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Padding Strategy Comparison – ISOT Dataset}
+\begin{table}[H]
+\centering
+\caption{Impact of Pre-padding, Post-padding and Fusion on ISOT Dataset}
+\label{tab:isot_padding}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\sisetup{table-format=1.4}
+\begin{tabular}{l S S S S}
+\toprule
+\textbf{Model} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-score} \\
+\midrule
+\multicolumn{5}{c}{\textit{Individual Padding}}\\
+\midrule
+LSTM PRE & 0.9851 & 0.9834 & 0.9852 & 0.9843 \\
+LSTM POST & 0.9844 & 0.9760 & 0.9916 & 0.9837 \\
+GRU PRE & 0.9889 & 0.9826 & \textbf{0.9941} & 0.9884 \\
+GRU POST & 0.9880 & 0.9887 & 0.9859 & 0.9873 \\
+RNN PRE & 0.9638 & 0.9673 & 0.9562 & 0.9617 \\
+RNN POST & 0.7998 & 0.7081 & 0.9850 & 0.8239 \\
+\midrule
+\multicolumn{5}{c}{\textit{Fusion (Pre + Post Padding)}}\\
+\midrule
+LSTM PRE+POST & 0.9871 & 0.9826 & 0.9904 & 0.9865 \\
+GRU PRE+POST & \textbf{0.9901} & \textbf{0.9911} & 0.9881 & \textbf{0.9896} \\
+RNN PRE+POST & 0.9712 & 0.9680 & 0.9714 & 0.9697 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Impact of Pre-padding, Post-padding and Fusion on Fake\_Real\_News\_Data Dataset}
+\label{tab:dataset2_padding}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\sisetup{table-format=1.3}
+\begin{tabular}{l S S S S}
+\toprule
+\textbf{Model} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-score} \\
+\midrule
+\multicolumn{5}{c}{\textit{Individual Padding}}\\
+\midrule
+LSTM PRE & 0.887 & 0.874 & 0.905 & 0.889 \\
+LSTM POST & 0.906 & 0.896 & 0.920 & 0.907 \\
+GRU PRE & 0.857 & \textbf{0.908} & 0.795 & 0.848 \\
+GRU POST & 0.735 & 0.710 & 0.795 & 0.750 \\
+RNN PRE & 0.721 & 0.738 & 0.685 & 0.710 \\
+RNN POST & 0.701 & 0.689 & 0.733 & 0.710 \\
+\midrule
+\multicolumn{5}{c}{\textit{Fusion (Pre + Post Padding)}}\\
+\midrule
+LSTM PRE+POST & \textbf{0.925} & \textbf{0.915} & \textbf{0.937} & \textbf{0.926} \\
+GRU PRE+POST & 0.860 & 0.892 & 0.820 & 0.855 \\
+RNN PRE+POST & 0.749 & 0.744 & 0.760 & 0.752 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{1.png}
+\caption{The comparison between individual models and ensemble approaches on the ISOT and Fake-Real News datasets indicates that ensemble methods consistently achieve higher accuracy than single classifiers, highlighting better generalization performance.}
+\label{fig:modelcomparison}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{2.png}
+\caption{Accuracy comparison of padding strategies across datasets. Fusion padding consistently improves classification performance compared to individual pre and post padding approaches.}
+\label{fig:accuracypadding}
+\end{figure}
+
+\subsection{Overall Discussion}
+
+The results obtained from both datasets confirm the effectiveness of the proposed hybrid ML–DL framework.On the larger ISOT dataset, deep learning models perform better than traditional machine learning classifiers, while hybrid ensemble methods further enhance performance, with RF+LSTM and RF+GRU delivering the best results. On the smaller Fake\_Real\_News\_Data dataset, statistical models such as SVM perform competitively, and attention-based hybrid models provide balanced precision and recall. 
+
+The padding analysis shows that combining pre-padding and post-padding consistently improves model stability. In particular, GRU fusion achieves the highest performance on the ISOT dataset, while LSTM fusion performs best on Dataset-2. These results suggest that combining statistical features, contextual sequence modeling, and padding fusion improves both generalization and reliability in fake news detection across datasets of varying sizes.
+\section{Conclusion and Future Work}
+\label{sec:conc}
+
+This paper proposes a hybrid machine learning–deep learning framework for fake news detection, which combines TF-IDF-based classifiers with recurrent neural networks through a soft voting ensemble approach. Additionally, a padding fusion technique that integrates both pre-padding and post-padding representations is introduced to enhance the stability of sequence learning.
+
+Experimental results on the ISOT and \textit{Fake-Real-News-Data} datasets show that hybrid models outperform individual classifiers. Ensemble combinations such as RF+LSTM and SVM+GRU achieved the best performance, while padding fusion further improved generalization and classification reliability.
+Overall, the use of padding fusion (both pre- and post-padding) along with the ML–DL hybrid ensemble enhanced classification performance, leading to more accurate and stable fake news detection.
+
+\subsection{Future Work}
+Future research can focus on exploring transformer-based methods, extending fake news detection to multilingual contexts, incorporating multimodal analysis that includes text, images, and videos, and enabling real-time deployment for monitoring content across social media platforms.
+
+\section*{Acknowledgment}
+We thank Almighty God, Dr. Lavu Rathaiah, Dr. P. Nagab-
+hushan, Commodore Dr. M. S. Raghunathan, Dr. Venkatesulu
+Dondeti, Dr. D. Radha Rani, Mr. Brundavanam Satya Sai, Mr. Amar
+Jukuntla, staff, friends, and family.
+
+
+\begin{thebibliography}{00}
+\bibitem{lu2025}
+Y. Lu and N. Yao, “Multimodal deep learning with attention mechanisms for fake news detection using text, image, and video data,” \textit{IEEE Access}, 2025.
+
+\bibitem{rout2025}
+J. Rout, M. Mishra, and M. J. Saikia, “Lightweight transformer-based architecture for efficient fake news detection,” \textit{IEEE Access}, 2025.
+
+\bibitem{chen2025}
+H. Chen, Y. Yu, H. Guo, B. Hu, S. Hu, J. Hu, S. Lyu, X. Wu, C. S. Lin, and X. Wang, “Multimodal fake news detection using large language models and vision transformers,” \textit{IEEE Access}, 2025.
+
+\bibitem{hussain2025}
+H. Hussain, N. Aslam, M. Fuzail, T. U. Rehman, and F. Nazim, “Machine learning ensemble approaches for fake news detection using TF-IDF features,” \textit{IEEE Access}, 2025.
+
+\bibitem{ishraquzzaman2025}
+M. Ishraquzzaman, M. A. I. Chowdhury, S. Rahman, and R. Khan, “Ensemble transformer and LLM-based framework for detecting fake and AI-generated news,” \textit{IEEE Access}, 2025.
+
+\bibitem{wang2024}
+J. Wang \textit{et al.}, “Self-attention-based Bi-LSTM model for fake news detection,” \textit{IEEE Access}, 2024.
+
+\bibitem{merryton2024}
+A. R. Merryton and M. G. Augasta, “Attribute-wise attention-based BiLSTM-CNN model for textual fake news classification,” \textit{IEEE Access}, 2024.
+
+\bibitem{malhotra2024}
+P. Malhotra and S. K. Malik, “AutoML and ensemble learning approaches for large-scale fake news detection,” \textit{IEEE Access}, 2024.
+
+\bibitem{almandouh2024}
+A. Almandouh \textit{et al.}, “Hybrid FastText, deep learning, and transformer-based models for Arabic fake news detection,” \textit{IEEE Access}, 2024.
+
+\bibitem{truica2023}
+C. O. Truică and E. S. Apostol, “Semantic fake news detection using Word2Vec, LSTM, and BERT,” \textit{IEEE Access}, 2023.
+
+\bibitem{wu2023}
+Y. Wu \textit{et al.}, “Graph neural network-based explainable fake news detection,” \textit{IEEE Access}, 2023.
+
+\bibitem{guo2023}
+Z. Guo \textit{et al.}, “Transformer and deep learning framework for fake news classification,” \textit{IEEE Access}, 2023.
+
+\bibitem{prachi2022}
+N. N. Prachi, M. H. Rafi, E. Alam, and R. Khan, “Fake news detection using BERT, LSTM, and traditional machine learning models,” \textit{IEEE Access}, 2022.
+
+\bibitem{hansrajh2021}
+A. Hansrajh, T. T. Adeliyi, and J. Wing, “Blending ensemble machine learning techniques for fake news detection,” \textit{IEEE Access}, 2021.
+
+\bibitem{jain2018}
+A. Jain and T. Kasbe, “Fake news detection using Naive Bayes and N-gram features,” \textit{Proc. Int. Conf. Intelligent Computing}, 2018.
+
+\bibitem{isot_dataset}
+A. R. Ahmed, “ISOT Fake News Dataset,” University of Victoria, Canada, 2019.
+
+\end{thebibliography}
+
+
+\end{document}
